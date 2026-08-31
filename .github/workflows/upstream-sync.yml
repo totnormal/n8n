@@ -1,0 +1,29 @@
+name: sync upstream
+
+on:
+  schedule:
+    - cron: 0 3 * * 0
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/n8n-io/n8n.git 2>/dev/null || git remote set-url upstream https://github.com/n8n-io/n8n.git
+          git fetch upstream
+      - name: Push sync branch
+        run: git push origin +refs/remotes/upstream/master:refs/heads/sync/upstream
+      - name: Open PR
+        env:
+          GH_TOKEN: ${%17{github.token}}
+        run: gh pr create --base master --head sync/upstream --title "chore: sync from upstream" --body "Automatic sync of n8n-io/n8n@master. Review and merge." || true
+}}
