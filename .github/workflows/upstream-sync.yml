@@ -21,7 +21,14 @@ jobs:
           git remote add upstream https://github.com/n8n-io/n8n.git 2>/dev/null || git remote set-url upstream https://github.com/n8n-io/n8n.git
           git fetch upstream master:refs/remotes/upstream/master
       - name: Push sync branch
-        run: git push origin +refs/remotes/upstream/master:refs/heads/sync/upstream
+        env:
+          SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          if [ -n "$SYNC_TOKEN" ]; then
+            git push "https://x-access-token:${SYNC_TOKEN}@github.com/totnormal/n8n.git" +refs/remotes/upstream/master:refs/heads/sync/upstream
+          else
+            git push origin +refs/remotes/upstream/master:refs/heads/sync/upstream
+          fi
       - name: Open PR
         env:
           GH_TOKEN: ${{ github.token }}
