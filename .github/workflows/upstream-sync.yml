@@ -32,6 +32,6 @@ jobs:
           fi
       - name: Open PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
           gh pr create --base master --head sync/upstream --title "chore: sync from upstream" --body "Automatic sync of n8n-io/n8n@master. Review and merge." || true
